@@ -29,6 +29,7 @@ export const product = createTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date(),
     ),
+    image: varchar("image", { length: 255 }),
   },
   (example) => ({
     createdByIdIdx: index("created_by_idx").on(example.createdById),

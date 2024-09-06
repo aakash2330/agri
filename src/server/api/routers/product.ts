@@ -7,6 +7,12 @@ import {
 } from "@/server/api/trpc";
 import { product } from "@/server/db/schema";
 
+const createProductZod = z.object({
+  name: z.string().min(1),
+  description: z.string().min(1),
+  image: z.string().min(1),
+});
+
 export const productRouter = createTRPCRouter({
   hello: publicProcedure
     .input(z.object({ text: z.string() }))
@@ -17,14 +23,13 @@ export const productRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(
-      z.object({ name: z.string().min(1), description: z.string().min(1) }),
-    )
+    .input(createProductZod)
     .mutation(async ({ ctx, input }) => {
       await ctx.db.insert(product).values({
         name: input.name,
         description: input.description,
         createdById: ctx.session.user.id,
+        image: input.image,
       });
     }),
 
@@ -33,6 +38,11 @@ export const productRouter = createTRPCRouter({
       orderBy: (product, { desc }) => [desc(product.createdAt)],
     });
 
+    return product ?? null;
+  }),
+
+  getAll: publicProcedure.query(async ({ ctx }) => {
+    const product = await ctx.db.query.product.findMany();
     return product ?? null;
   }),
 
