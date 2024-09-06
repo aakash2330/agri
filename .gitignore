@@ -45,3 +45,4 @@ yarn-error.log*
 # idea files
 .idea
 *.pem
+agri-github-token.txt
