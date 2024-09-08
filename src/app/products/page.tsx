@@ -6,12 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { type product } from "@/server/db/schema";
 import { api } from "@/trpc/server";
-import { type InferSelectModel } from "drizzle-orm";
 import Image from "next/image";
-
-type Product = InferSelectModel<typeof product>;
+import Link from "next/link";
+import { type Product } from "types/product";
 
 export default async function Page() {
   const allProducts = await api.product.getAll();
@@ -33,11 +31,20 @@ function ProductCard({ product }: { product: Product }) {
         <CardTitle>{product.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Image src={product.image!} alt="" width={500} height={500}></Image>
+        <Image
+          priority={true}
+          style={{ objectFit: "contain" }}
+          src={product.image!}
+          alt=""
+          width={500}
+          height={500}
+        ></Image>
         <p>{product.description}</p>
       </CardContent>
       <CardFooter>
-        <Button>Book now</Button>
+        <Button>
+          <Link href={`/products/${product.id}`}>Book now</Link>
+        </Button>
       </CardFooter>
     </Card>
   );

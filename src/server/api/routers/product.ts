@@ -33,13 +33,14 @@ export const productRouter = createTRPCRouter({
       });
     }),
 
-  getLatest: publicProcedure.query(async ({ ctx }) => {
-    const product = await ctx.db.query.product.findFirst({
-      orderBy: (product, { desc }) => [desc(product.createdAt)],
-    });
-
-    return product ?? null;
-  }),
+  getById: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const product = await ctx.db.query.product.findFirst({
+        where: (product, { eq }) => eq(product.id, input.id),
+      });
+      return product ?? null;
+    }),
 
   getAll: publicProcedure.query(async ({ ctx }) => {
     const product = await ctx.db.query.product.findMany();

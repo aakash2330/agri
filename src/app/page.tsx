@@ -1,13 +1,12 @@
 import Link from "next/link";
 
 import { getServerAuthSession } from "@/server/auth";
-import { api, HydrateClient } from "@/trpc/server";
+import { HydrateClient } from "@/trpc/server";
 import { ProfileForm } from "./_components/productForm";
 import { Button } from "@/components/ui/button";
 
 export default async function Home() {
   const session = await getServerAuthSession();
-  void api.product.getLatest.prefetch();
 
   return (
     <HydrateClient>
