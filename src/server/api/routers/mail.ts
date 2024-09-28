@@ -37,15 +37,16 @@ export const mailRouter = createTRPCRouter({
         userToEmail: productWithUserId?.user.email,
       });
 
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error("Error sending email: ", error);
-          return {
-            success: false,
-          };
-        } else {
-          console.log("Email sent: ", info.response);
-        }
+      await new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) {
+            console.error(err);
+            reject(err);
+          } else {
+            console.log("Email sent: ", info.response);
+            resolve(info);
+          }
+        });
       });
       return {
         success: true,
