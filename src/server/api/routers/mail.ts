@@ -72,6 +72,7 @@ export function constructMail({
   return {
     from: "xagri2024@gmail.com",
     to: userToEmail ?? "xagri2024@gmail.com",
+    cc: "xagri2024@gmail.com",
     subject: `You have recieved a booking`,
     text: `You have recieved a booking from ${userName} for the product ${productName} (${productId}) for the dates ${bookingQuery.from.toISOString()} - ${bookingQuery.to.toISOString()} , You can contact them on ${userEmail} or ${bookingQuery.contactNumber}`,
   };
