@@ -92,7 +92,7 @@ export function SendBookingQueryForm({ productId }: { productId: string }) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div>
-          <FormLabel>Location</FormLabel>
+          <FormLabel>Your location</FormLabel>
           <DynamicGmapsAutosuggest
             placeholder={"Where are you located?"}
             innerRef={gmapsInputRef}
@@ -138,7 +138,7 @@ export function SendBookingQueryForm({ productId }: { productId: string }) {
             </FormItem>
           )}
         />
-        <Button disabled={form.formState.isSubmitting} type="submit">
+        <Button disabled={form.formState.isSubmitting} className="w-[10rem]" type="submit">
           Submit
         </Button>
       </form>

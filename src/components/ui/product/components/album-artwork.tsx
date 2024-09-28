@@ -25,7 +25,7 @@ export function ProductItem({
           <div>
             <div className="overflow-hidden rounded-md">
               <Image
-                priority={true}
+                priority
                 src={product.image[0]!}
                 alt={product.id.toString()}
                 width={width}
