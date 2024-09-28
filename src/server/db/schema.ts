@@ -5,7 +5,6 @@ import {
   pgEnum,
   pgTableCreator,
   primaryKey,
-  serial,
   text,
   timestamp,
   varchar,
@@ -13,29 +12,6 @@ import {
 import { type AdapterAccount } from "next-auth/adapters";
 
 export const createTable = pgTableCreator((name) => `agri_${name}`);
-
-export const product = createTable(
-  "product",
-  {
-    id: serial("id").primaryKey(),
-    name: varchar("name", { length: 255 }),
-    description: varchar("description", { length: 255 }),
-    createdById: varchar("created_by", { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
-    image: varchar("image", { length: 255 }),
-  },
-  (example) => ({
-    createdByIdIdx: index("created_by_idx").on(example.createdById),
-    nameIndex: index("name_idx").on(example.name),
-  }),
-);
 
 const roles = ["admin", "user"] as const;
 export const roleEnum = pgEnum("role", roles);
@@ -52,12 +28,14 @@ export const users = createTable("user", {
     withTimezone: true,
   }).default(sql`CURRENT_TIMESTAMP`),
   role: roleEnum("role").default("user").notNull(),
-  password: varchar("password", { length: 255 }).notNull(),
+  password: varchar("password", { length: 255 }),
   image: varchar("image", { length: 255 }),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  bookings: many(booking),
+  products: many(product),
 }));
 
 export const accounts = createTable(
@@ -91,6 +69,58 @@ export const accounts = createTable(
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),
+}));
+
+export const product = createTable("product", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: varchar("description", { length: 255 }).notNull(),
+  createdById: varchar("created_by", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+  image: varchar("image", { length: 255 }).array().notNull(),
+  address: varchar("address", { length: 255 }).notNull(),
+});
+
+export const productRelations = relations(product, ({ one }) => ({
+  user: one(users, {
+    fields: [product.createdById],
+    references: [users.id],
+  }),
+}));
+
+export const booking = createTable("booking", {
+  id: varchar("id", { length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  productId: varchar("product_id", { length: 255 })
+    .notNull()
+    .references(() => product.id),
+  bookingQuery: varchar("booking_query", { length: 255 }),
+  from: timestamp("from", { withTimezone: true }).notNull(),
+  to: timestamp("to", { withTimezone: true }).notNull(),
+  contactNumber: varchar("contact_number", { length: 255 }).notNull(),
+  address: varchar("address", { length: 255 }).notNull(),
+});
+
+export const bookingRelations = relations(booking, ({ one }) => ({
+  user: one(users, {
+    fields: [booking.userId],
+    references: [users.id],
+  }),
 }));
 
 export const sessions = createTable(

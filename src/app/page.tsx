@@ -1,47 +1,29 @@
+import { HydrateClient } from "@/trpc/server";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-import { getServerAuthSession } from "@/server/auth";
-import { HydrateClient } from "@/trpc/server";
-import { ProfileForm } from "./_components/productForm";
-import { Button } from "@/components/ui/button";
-
 export default async function Home() {
-  const session = await getServerAuthSession();
-
   return (
     <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex flex-col items-center justify-center gap-4">
-              <Button>
-                <Link href="/products">{`All products ->`}</Link>
-              </Button>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
-              <div className="text-center text-2xl text-white">
-                {session && (
-                  <span>
-                    Logged in as
-                    {Object.entries(session.user).map(([key, value]) => {
-                      return (
-                        <div
-                          key={`${JSON.stringify(key)}-${JSON.stringify(value)}`}
-                        >{`${JSON.stringify(key)}-${JSON.stringify(value)}`}</div>
-                      );
-                    })}
-                  </span>
-                )}
-              </div>
-            </div>
+      <div className="bg-grid-white/[0.02] relative flex h-screen w-full flex-col overflow-hidden antialiased md:items-center md:justify-center">
+        <div className="relative z-10 mx-auto flex w-full max-w-7xl grow flex-col items-center justify-center p-4 pt-20 md:pt-0">
+          <h1 className="bg-opacity-50 bg-gradient-to-b from-green-700 to-green-500 bg-clip-text text-center text-4xl font-bold text-transparent md:text-7xl">
+            Welcome to agrix
+          </h1>
+          <p className="mx-auto mt-4 max-w-lg text-center text-base font-normal text-neutral-800">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat. Duis aute irure dolor in
+          </p>
+          <br />
+          <div className="flex items-center justify-center">
+            <Button className="bg-neutral-700">
+              <Link href="/products">{`All products ->`}</Link>
+            </Button>
           </div>
-          {session?.user && <ProfileForm></ProfileForm>}
         </div>
-      </main>
+      </div>
     </HydrateClient>
   );
 }

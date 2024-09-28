@@ -6,8 +6,18 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     domains: ["utfs.io"],
+
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com", // Change this to your CDN domain
+      },
+    ],
   },
 };
 

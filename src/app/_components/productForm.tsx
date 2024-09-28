@@ -4,7 +4,6 @@ import { UploadDropzone } from "@/lib/uploadthing";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,23 +14,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import _ from "lodash";
+import { useRef } from "react";
+import { createProductZod, type TcreateProductZod } from "types/product";
+import dynamic from "next/dynamic";
 
-const createProductFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name of the product must be at least 2 characters.",
-  }),
-
-  description: z.string().min(2, {
-    message: "description of the product must be at least 2 characters.",
-  }),
-});
-
-type TcreateProductFormSchema = typeof createProductFormSchema;
+const DynamicGmapsAutosuggest = dynamic(
+  () => import("../../components/gmaps-autosuggest"),
+  {
+    ssr: false,
+  },
+);
 
 export function ProfileForm() {
-  const [fileUploadedUrl, setFileUploadedUrl] = useState<string | null>("");
+  const gmapsInputRef = useRef<any>(null);
 
   const utils = api.useUtils();
   const createProduct = api.product.create.useMutation({
@@ -41,20 +36,25 @@ export function ProfileForm() {
     },
   });
 
-  const form = useForm<z.infer<TcreateProductFormSchema>>({
-    resolver: zodResolver(createProductFormSchema),
+  const form = useForm<TcreateProductZod>({
+    resolver: zodResolver(createProductZod),
     defaultValues: {
       name: "",
       description: "",
+      address: "",
+      image: [],
     },
   });
 
-  function onSubmit(values: z.infer<TcreateProductFormSchema>) {
-    if (_.isEmpty(fileUploadedUrl)) {
-      return alert("Please Upload a file to continue");
-    }
-    const { name, description } = values;
-    createProduct.mutate({ name, description, image: fileUploadedUrl! });
+  function onSubmit(values: TcreateProductZod) {
+    console.log("submitted", { values });
+    const { name, description, address, image } = values;
+    createProduct.mutate({
+      name,
+      description,
+      image,
+      address,
+    });
   }
   return (
     <>
@@ -63,8 +63,8 @@ export function ProfileForm() {
         onClientUploadComplete={(res) => {
           console.log("Files: ", res);
           alert("Upload Completed");
-          const uploadedFile = res[0]?.url ?? null;
-          setFileUploadedUrl(uploadedFile);
+          const uploadedFileUrls = res.map((r) => r.url ?? "");
+          form.setValue("image", uploadedFileUrls);
         }}
         onUploadError={(error: Error) => {
           alert(`ERROR! ${error.message}`);
@@ -102,7 +102,20 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <DynamicGmapsAutosuggest
+            placeholder={"Where is the product located?"}
+            innerRef={gmapsInputRef}
+            form={form}
+          ></DynamicGmapsAutosuggest>
+          <Button
+            type="submit"
+            onClick={() => {
+              //onSubmit(form.getValues());
+              console.log(form.getValues());
+            }}
+          >
+            Submit
+          </Button>
         </form>
       </Form>
     </>

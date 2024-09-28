@@ -6,12 +6,7 @@ import {
   publicProcedure,
 } from "@/server/api/trpc";
 import { product } from "@/server/db/schema";
-
-const createProductZod = z.object({
-  name: z.string().min(1),
-  description: z.string().min(1),
-  image: z.string().min(1),
-});
+import { createProductZod } from "types/product";
 
 export const productRouter = createTRPCRouter({
   hello: publicProcedure
@@ -30,11 +25,12 @@ export const productRouter = createTRPCRouter({
         description: input.description,
         createdById: ctx.session.user.id,
         image: input.image,
+        address: input.address,
       });
     }),
 
   getById: publicProcedure
-    .input(z.object({ id: z.number() }))
+    .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const product = await ctx.db.query.product.findFirst({
         where: (product, { eq }) => eq(product.id, input.id),

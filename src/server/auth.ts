@@ -88,17 +88,22 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) throw new Error("Email or password is incorrect");
 
-        const isPasswordMatched = await bcrypt.compare(password, user.password);
-        if (!isPasswordMatched) {
-          throw new Error("Email or password is incorrect");
+        if (user.password) {
+          const isPasswordMatched = await bcrypt.compare(
+            password,
+            user.password,
+          );
+          if (!isPasswordMatched) {
+            throw new Error("Email or password is incorrect");
+          }
+          return {
+            id: user.id,
+            name: user.name,
+            email: email,
+            emailVerified: user.emailVerified,
+            role: user.role,
+          };
         }
-        return {
-          id: user.id,
-          name: user.name,
-          email: email,
-          emailVerified: user.emailVerified,
-          role: user.role,
-        };
       },
     }),
     CredentialsProvider({
