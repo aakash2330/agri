@@ -5,14 +5,26 @@ import { Separator } from "../separator";
 import { ScrollArea, ScrollBar } from "../scroll-area";
 import { api } from "@/trpc/server";
 import { ProductItem } from "./components/album-artwork";
+import { type TsearchParams } from "types/product";
+import _ from "lodash";
 
 export const metadata: Metadata = {
   title: "Music App",
   description: "Example music app using the components.",
 };
 
-export async function ProductPage() {
-  const allProducts = await api.product.getAll();
+export async function ProductPage({
+  searchParams,
+}: {
+  searchParams: TsearchParams;
+}) {
+  const allProducts = await api.product.getAll({
+    address: searchParams.address,
+  });
+  if (_.isEmpty(allProducts)) {
+    return <div>No products found</div>;
+  }
+
   return (
     <div className="block h-full">
       <div className="h-full border-t">

@@ -22,3 +22,5 @@ export type TcreateProductZod = z.infer<typeof createProductZod>;
 
 export const insertProductSchema = createInsertSchema(product);
 export const selectProductSchema = createSelectSchema(product);
+
+export type TsearchParams = {address:string}

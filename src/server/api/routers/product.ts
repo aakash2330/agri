@@ -38,9 +38,32 @@ export const productRouter = createTRPCRouter({
       return product ?? null;
     }),
 
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    const product = await ctx.db.query.product.findMany();
-    return product ?? null;
+  getAll: publicProcedure
+    .input(z.object({ address: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      console.log({
+        ...(input.address && {
+          where: true,
+        }),
+      });
+      const product = await ctx.db.query.product.findMany({
+        ...(input.address && {
+          where: (product, { like }) =>
+            like(product.address, `%${input.address ?? ""}%`),
+        }),
+      });
+      return product ?? null;
+    }),
+
+  getAllCities: publicProcedure.query(async ({ ctx }) => {
+    const allAddress = await ctx.db
+      .select({ address: product.address })
+      .from(product);
+    const allCities = allAddress.map((item) => {
+      const cityFromAddress = item.address.split(",")[0];
+      return cityFromAddress;
+    });
+    return allCities ?? null;
   }),
 
   getSecretMessage: protectedProcedure.query(() => {

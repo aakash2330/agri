@@ -2,12 +2,19 @@ import { cn } from "@/lib/utils";
 
 import { type Playlist } from "../data/playlists";
 import { Button } from "../../button";
+import { api } from "@/trpc/server";
+import _ from "lodash";
+import { SidebarButton } from "./sidebarButton";
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
   playlists: Playlist[];
 }
 
-export function Sidebar({ className }: SidebarProps) {
+export async function Sidebar({ className }: SidebarProps) {
+  const allCities = await api.product.getAllCities();
+  if (_.isEmpty(allCities)) {
+    return <div>No Cities Available</div>;
+  }
   return (
     <div className={cn("pb-12", className)}>
       <div className="space-y-4 py-4">
@@ -16,7 +23,7 @@ export function Sidebar({ className }: SidebarProps) {
             Category
           </h2>
           <div className="space-y-1">
-            {["Categore 1", "Category 2", "Category 3"].map((item, index) => {
+            {["Heavy", "Medium", "Light"].map((item, index) => {
               return (
                 <Button
                   key={index}
@@ -34,16 +41,8 @@ export function Sidebar({ className }: SidebarProps) {
             City
           </h2>
           <div className="space-y-1">
-            {new Array(10).fill(null).map((item, index) => {
-              return (
-                <Button
-                  key={index}
-                  variant="ghost"
-                  className="w-full justify-start text-green-500"
-                >
-                  {`City-${index}`}
-                </Button>
-              );
+            {allCities.map((item, index) => {
+              return <SidebarButton key={index} text={item}></SidebarButton>;
             })}
           </div>
         </div>
