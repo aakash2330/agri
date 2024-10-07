@@ -41,11 +41,6 @@ export const productRouter = createTRPCRouter({
   getAll: publicProcedure
     .input(z.object({ address: z.string().optional() }))
     .query(async ({ ctx, input }) => {
-      console.log({
-        ...(input.address && {
-          where: true,
-        }),
-      });
       const product = await ctx.db.query.product.findMany({
         ...(input.address && {
           where: (product, { like }) =>

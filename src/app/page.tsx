@@ -11,10 +11,11 @@ export default async function Home() {
             Welcome to agrix
           </h1>
           <p className="mx-auto mt-4 max-w-lg text-center text-base font-normal text-neutral-800">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquipex ea commodo consequat. Duis aute irure dolor in
+            {`Empowering Farmers, One Equipment at a Time Access the Tools You
+            Need, When You Need Them Whether you're looking to borrow or lend
+            agricultural equipment, our platform connects farmers to share
+            resources, reduce costs, and boost productivity. Grow your farm
+            smarter and faster with easy, reliable access to essential tools`}
           </p>
           <br />
           <div className="flex items-center justify-center">
